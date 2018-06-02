@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import optimize, io
+import time
 
 
 def sigmoid(z):
@@ -79,10 +80,8 @@ class network(object):
             active0 = np.ones(m)
             active = np.insert(active, 0, values=active0, axis=1)
             z = np.dot(active, w.T)
-            active = sigmoid_prime(z)
+            active = sigmoid(z)
 
-            # active0 = np.ones(m)
-            # active = np.insert(active, 0, values=active0, axis=1)
         return active
 
     def cost(self, weight):
@@ -103,11 +102,14 @@ class network(object):
 
     def fit_cg(self):
         weight = optimize.fmin_cg(self.cost, self.initial_weight, fprime=self.gradient)
+        weight = reduction_weight(weight, self.layer_size)
         return weight
 
 
+
 if __name__ == "__main__":
-    data = io.loadmat('/home/andrew/桌面/CoCo/data/ex3data1.mat')
+    start = time.time()
+    data = io.loadmat('/home/sjl/桌面/CoCo/data/ex3data1.mat')
     x = data['X']  # 特征值
     y = data['y']  # 目标向量
     # 对y做预处理
@@ -121,3 +123,6 @@ if __name__ == "__main__":
         
     net = network([400, 25, 10], x, y)
     net.fit_cg()
+    end = time.time()
+    time = start - end
+    print(time)
