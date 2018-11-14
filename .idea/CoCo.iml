@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/logicRegression" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/network" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/kmean" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/PCA" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.5 (CoCo)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
