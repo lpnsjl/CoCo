@@ -23,7 +23,9 @@ class FC(object):
         :return:
         """
         self.input = input_array
-        self.output = self.activation.forward(input_array)
+        self.output = self.activation.forward(self.w@input_array)
+        return self.output
+
 
 
     def backward(self, delta_array):
@@ -56,7 +58,7 @@ class NetWork(object):
         :param layers:
         """
         # 构造神经网络层次结构
-        self.layers = [FC(ip, op, Sigmoid()) for ip, op in zip(layers[1:], layers[:-1])]
+        self.layers = [FC(ip, op, Sigmoid()) for ip, op in zip(layers[:-1], layers[1:])]
 
     def forward(self, input_array):
         """
@@ -75,7 +77,7 @@ class NetWork(object):
         :param label: 真实标签
         :return:
         """
-        delta = (self.layers[-1].output - label)*self.layers[-1].backward(self.layers[-1].output)
+        delta = (self.layers[-1].output - label)*self.layers[-1].activation.backward(self.layers[-1].output)
         for layer in self.layers[::-1]:
             layer.backward(delta)
             delta = layer.delta
@@ -139,6 +141,7 @@ class NetWork(object):
         :param labels: 真实样本标签
         :return:
         """
+        labels = [np.argmax(label) for label in labels]
         pre_labels = self.predict(data_set)
         size = len(pre_labels)
         correct_num = 0
@@ -158,6 +161,7 @@ def convert(data):
     :return:
     """
     new = []
+
     for row in data:
         new.append(row.reshape(-1, 1))
     return new
@@ -165,8 +169,20 @@ def convert(data):
 def load_data():
     mnist = tf.keras.datasets.mnist
     (train_data, train_label), (test_data, test_label) = mnist.load_data()
+    size = len(train_label)
+    new_train_label = []
+    new_test_label = []
+    for i in range(size):
+        new_train = np.zeros((10, 1))
+        new_train[train_label[i], 0] = 1
+        new_train_label.append(new_train)
+    for i in range(len(test_label)):
+        new_test = np.zeros((10, 1))
+        new_test[test_label[i], 0] = 1
+        new_test_label.append(new_test)
+
     train_data, test_data = convert(train_data), convert(test_data)
-    return (train_data, train_label), (test_data, test_label)
+    return (train_data, new_train_label), (test_data, new_test_label)
 
 if __name__ == "__main__":
     (train_data, train_label), (test_data, test_label) = load_data()
