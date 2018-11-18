@@ -1,23 +1,23 @@
 # 激活函数
-import numpy as np
 
+import numpy as np
 
 class Sigmoid(object):
     """
-    sigmoid 激活函数
+    sigmoid激活函数
     """
     def forward(self, z):
         """
         前向传播
+        :param z:
         :return:
         """
         return 1/(1+np.exp(-z))
 
-    def backward(self, z):
+    def backward(self, input):
         """
-        反向传播
-        :param z:
+        反向传播,
+        :param input: 连接层的输入
         :return:
         """
-        a = 1/(1+np.exp(-z))
-        return a*(1-a)
+        return input*(1-input)
