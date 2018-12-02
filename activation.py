@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 class Sigmoid(object):
     """
     sigmoid激活函数
@@ -21,3 +22,27 @@ class Sigmoid(object):
         :return:
         """
         return input*(1-input)
+
+
+class Relu(object):
+    """
+    Relu激活函数
+    """
+    def forward(self, z):
+        """
+        前向传播
+        :param z:
+        :return:
+        """
+        z[z <= 0] = 0
+        return z
+
+    def backward(self, output):
+        """
+        反向传播
+        :param output:
+        :return:
+        """
+        output[output == 0] = 0
+        output[output > 0] = 1
+        return output

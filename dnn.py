@@ -1,51 +1,7 @@
 # 深度神经网络DNN
 import numpy as np
 from activation import Sigmoid
-
-class FC(object):
-    """
-    全连接层
-    """
-    def __init__(self, input_size, output_size, activation):
-        """
-        初始化
-        :param input_size: 输入大小
-        :param output_size: 输出大小
-        """
-        self.w = np.random.uniform(-0.1, 0.1, (output_size, input_size))
-        self.b = np.zeros((output_size, 1))
-        self.activation = activation
-
-    def forward(self, input_array):
-        """
-        前向传播
-        :param input_array: 连接层输入
-        :return:
-        """
-        self.input = input_array
-        self.output = self.activation.forward(self.w@input_array)
-        return self.output
-
-
-
-    def backward(self, delta_array):
-        """
-        反向传播
-        :param delta_array: 该连接层直接导致的误差
-        :return:
-        """
-        self.grad_w = delta_array@self.input.T
-        self.grad_b = delta_array
-        self.delta = self.activation.backward(self.input)*(self.w.T@delta_array) # 上一层直接导致的误差
-
-    def update(self, rate):
-        """
-        更新梯度
-        :param rate: 学习率
-        :return:
-        """
-        self.w -= rate*self.grad_w
-        self.b -= rate*self.grad_b
+from layers.FullConnection import FC
 
 
 class NetWork(object):
@@ -79,8 +35,15 @@ class NetWork(object):
         """
         delta = (self.layers[-1].output - label)*self.layers[-1].activation.backward(self.layers[-1].output)
         for layer in self.layers[::-1]:
-            layer.backward(delta)
-            delta = layer.delta
+            index = self.layers.index(layer)
+            activation = None
+            # 计算上一层的delta需要上一层的activation, 但是第一层全连接层不再需要计算输入层的delta
+            if index > 0:
+                activation = self.layers[index-1].activation
+                layer.backward(delta, activation)
+                delta = layer.delta
+            else:
+                layer.backward(delta, activation)
 
     def update(self, rate):
         """
@@ -106,7 +69,7 @@ class NetWork(object):
     def train(self, data_set, labels, rate, epoch):
         """
         神经网络训练
-        :param samples: 训练数据集
+        :param data_set: 训练数据集
         :param labels: 训练样本标签
         :param rate: 学习率
         :param epoch: 迭代次数
@@ -117,7 +80,8 @@ class NetWork(object):
             for d in range(size):
                 self.train_one_sample(data_set[d], labels[d], rate)
             # 每五次epoch打印一次精度
-            if epoch%5 == 0:
+            if i % 5 == 0:
+                print("epoch{}:------------------------".format(i))
                 self.evaluate(data_set, labels)
 
     def predict(self, pre_data_set):
@@ -166,6 +130,7 @@ def convert(data):
         new.append(row.reshape(-1, 1))
     return new
 
+
 def load_data():
     mnist = tf.keras.datasets.mnist
     (train_data, train_label), (test_data, test_label) = mnist.load_data()
@@ -184,10 +149,11 @@ def load_data():
     train_data, test_data = convert(train_data), convert(test_data)
     return (train_data, new_train_label), (test_data, new_test_label)
 
+
 if __name__ == "__main__":
     (train_data, train_label), (test_data, test_label) = load_data()
-    net = NetWork([784, 3, 10])
-    net.train(train_data, train_label, 0.1, 100)
+    net = NetWork([784, 25, 10])
+    net.train(train_data, train_label, 0.003, 100)
 
 
 
