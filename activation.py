@@ -24,36 +24,14 @@ class Sigmoid(object):
         :param output: 连接层的输入
         :return:
         """
-<<<<<<< HEAD
-        return input*(1-input)
-=======
+
         return output*(1-output)
->>>>>>> e48c7a46d66fc0b3191e6a9fe7cd0d1cc6378952
 
 
 class Relu(object):
     """
     Relu激活函数
     """
-<<<<<<< HEAD
-    def forward(self, z):
-        """
-        前向传播
-        :param z:
-        :return:
-        """
-        z[z <= 0] = 0
-        return z
-
-    def backward(self, output):
-        """
-        反向传播
-        :param output:
-        :return:
-        """
-        output[output == 0] = 0
-=======
-
     @staticmethod
     def forward(z):
         z[z <= 0] = 0
@@ -62,6 +40,31 @@ class Relu(object):
     @staticmethod
     def backward(output):
         output[output <= 0] = 0
->>>>>>> e48c7a46d66fc0b3191e6a9fe7cd0d1cc6378952
         output[output > 0] = 1
         return output
+
+
+class TanhActivator(object):
+    """
+    tanh激活函数
+    """
+    @staticmethod
+    def forward_propagation(z):
+        return np.tanh(z)
+
+    @staticmethod
+    def backward_propagation(o):
+        return 1 - o**2
+
+
+class SoftmaxActivator(object):
+    """
+    softmax激活函数
+    """
+    @staticmethod
+    def forward_propagation(z):
+        return np.exp(z)/np.sum(np.exp(z))
+
+    @staticmethod
+    def backward_propagation(o):
+        return
